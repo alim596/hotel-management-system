@@ -2,6 +2,7 @@
 // src/mock-data.ts
 import { Hotel } from './hotels/schemas/hotel.schema/hotel.schema';
 import { RoomType } from './room-types/schemas/room-type.schema/room-type.schema';
+import { Booking } from './bookings/schemas/booking.schema';
 
 // --- Hotels ---
 export const HOTELS: Hotel[] = [
@@ -186,5 +187,32 @@ export const ROOM_TYPES: RoomType[] = [
     sizeInSqFt: 320,
     basePrice: 140,
     images: ['/assets/room10.jpg'],
+  },
+];
+
+export const BOOKINGS: Booking[] = [
+  {
+    id: 'b1',
+    hotelId: '1',
+    roomTypeId: 'rt1',
+    checkIn: '2025-06-01',
+    checkOut: '2025-06-05',
+    firstName: 'Alice',
+    lastName: 'Yılmaz',
+    email: 'alice@example.com',
+    phone: '+905551112233',
+    createdAt: '2025-04-01T10:00:00Z',
+  },
+  {
+    id: 'b2',
+    hotelId: '2',
+    roomTypeId: 'rt4',
+    checkIn: '2025-07-10',
+    checkOut: '2025-07-15',
+    firstName: 'Burak',
+    lastName: 'Kaya',
+    email: 'burak@example.com',
+    phone: '+905559998877',
+    createdAt: '2025-04-15T14:30:00Z',
   },
 ];
