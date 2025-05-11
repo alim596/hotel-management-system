@@ -1,31 +1,36 @@
-export interface Hotel {
-  id: string;
-  name: string;
-  city: string;
-  rating: number;
-  price: number;
-  imageUrl: string;
+import type { Hotel, RoomType } from "./types";
+import { mockHotels, mockRoomTypes } from "./mock-data";
+
+/**
+ * Fetch all hotels (mock)
+ */
+export async function getHotels(): Promise<Hotel[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockHotels), 300);
+  });
 }
 
-export async function getHotels(): Promise<Hotel[]> {
-  // TODO: replace with real API call via axios later
-  return Promise.resolve([
-    {
-      id: "1",
-      name: "Grand Istanbul Hotel",
-      city: "Istanbul",
-      rating: 4.5,
-      price: 120,
-      imageUrl: "/assets/hotel1.jpg",
-    },
-    {
-      id: "2",
-      name: "Ankara Comfort Suites",
-      city: "Ankara",
-      rating: 4.0,
-      price: 95,
-      imageUrl: "/assets/hotel2.jpg",
-    },
-    // …add a few more for your mock
-  ]);
+/**
+ * Fetch a single hotel by ID (mock)
+ */
+export async function getHotelById(id: string): Promise<Hotel> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const hotel = mockHotels.find((h) => h.id === id);
+      if (hotel) resolve(hotel);
+      else reject(new Error("Hotel not found"));
+    }, 300);
+  });
+}
+
+/** Fetch mock room types for a given hotel */
+export async function getRoomTypesByHotelId(
+  hotelId: string
+): Promise<RoomType[]> {
+  return new Promise((res) =>
+    setTimeout(
+      () => res(mockRoomTypes.filter((rt) => rt.hotelId === hotelId)),
+      300
+    )
+  );
 }

@@ -5,6 +5,7 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  font-family: helvetica, arial, sans-serif;
 }
 
 @media (prefers-reduced-motion: no-preference) {
