@@ -10,7 +10,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/hotels" element={<HotelList />} />
-      <Route path="/hotels/:id" element={<HotelDetail />} />
+      <Route path="/hotels/:hotelId" element={<HotelDetail />} />
       <Route path="/booking/:hotelId" element={<Booking />} />
       {/* Redirect any unknown route back to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
