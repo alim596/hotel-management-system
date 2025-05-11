@@ -1,12 +1,5 @@
 // src/services/mock-data.ts
-import type {
-  Hotel,
-  RoomType,
-  Room,
-  Guest,
-  Reservation,
-  Review,
-} from "./types";
+import type { Hotel, RoomType, Room, Guest, Review, Booking } from "./types";
 
 // --- Hotels ---
 export const mockHotels: Hotel[] = [
@@ -240,7 +233,7 @@ export const mockGuests: Guest[] = [
 ];
 
 // --- Reservations ---
-export const mockReservations: Reservation[] = [
+export const mockReservations: Booking[] = [
   {
     id: "res1",
     guestId: "g1",

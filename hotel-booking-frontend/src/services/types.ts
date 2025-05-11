@@ -36,14 +36,18 @@ export interface Guest {
   phone: string;
 }
 
-export interface Reservation {
+export interface Booking {
   id: string;
-  guestId: string;
-  roomId: string;
-  checkIn: string; // date
-  checkOut: string; // date
-  totalPrice: number;
-  status: "pending" | "confirmed" | "cancelled";
+  hotelId: string;
+  roomTypeId: string;
+  checkIn: string;
+  checkOut: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+  status?: "pending" | "confirmed" | "cancelled"; // optional if you need it
 }
 
 export interface Review {
