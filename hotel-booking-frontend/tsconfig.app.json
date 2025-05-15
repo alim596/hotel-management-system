@@ -21,7 +21,13 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /*for absolute paths*/
+    "baseUrl": "./src",
+    "paths": {
+    "@/*": ["*"]
+    },
   },
-  "include": ["src"]
+  "include": ["src", "../hotel-backend/src/destinations.ts"]
 }
