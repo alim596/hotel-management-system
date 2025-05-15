@@ -1,35 +1,9 @@
-//import destinations from "@/data/destinations";  //implement backend later
 import { useState, useEffect } from "react";
 import { FaSearchLocation, FaCalendarAlt, FaUser, FaDownload, FaRegCommentDots} from "react-icons/fa";
 import {IoLogInOutline} from "react-icons/io5";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-
-/* for search bar, will bring once connecting to backend
-const [query, setQuery] = useState("");
-const [filteredDestinations, setFilteredDestinations] = useState<string[]>([]);
-const [showDropdown, setShowDropdown] = useState(false);
-
-useEffect(() => {
-  if (query.trim() === "") {
-    setFilteredDestinations([]);
-    setShowDropdown(false);
-    return;
-  }
-
-  const results = destinations.filter((place) =>
-    place.toLowerCase().includes(query.toLowerCase())
-  );
-
-  setFilteredDestinations(results);
-  setShowDropdown(results.length > 0);
-}, [query]);
-
-const handleSelect = (value: string) => {
-  setQuery(value);
-  setShowDropdown(false);
-};*/
 
 function Navbar() {
   return (
@@ -64,8 +38,9 @@ function Navbar() {
 }
 export default function Home() {
   //for check in and check out
-  const [checkInDate, setCheckInDate] = useState<Date | null>(null);
-  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
+  const [checkInDate, setCheckInDate] = useState<Date | undefined>(undefined);
+  const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(undefined);
+
 
   //for number of guests and rooms option
   type Room = {
@@ -78,10 +53,34 @@ export default function Home() {
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
 
 
-  //remove the three lines below when we bring back the top commented part after connecting destinations.ts for the search bar
+  //for where are you going drop down
   const [query, setQuery] = useState("");
   const [filteredDestinations, setFilteredDestinations] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+  if (query.trim() === "") {
+    setFilteredDestinations([]);
+    setShowDropdown(false);
+    return;
+  }
+
+  fetch("http://localhost:3000/api/destinations")
+    .then(res => res.json())
+    .then((data: { city: string; country: string }[]) => {
+      const filtered = data.filter((place) =>
+        `${place.city}, ${place.country}`
+          .toLowerCase()
+          .includes(query.toLowerCase())
+      );
+
+      // Format for display: "Istanbul, Turkey"
+      setFilteredDestinations(filtered.map((p) => `${p.city}, ${p.country}`));
+      setShowDropdown(true);
+    })
+    .catch((err) => console.error("Error fetching destinations", err));
+}, [query]);
+
   return (
     <>
       <Navbar />
@@ -115,19 +114,23 @@ export default function Home() {
               />
             </div>
                 
-            {showDropdown && (
-              <ul className="absolute left-0 right-0 bg-white border rounded-md shadow-md mt-1 max-h-60 overflow-y-auto z-20">
-                {filteredDestinations.map((place) => (
-                  <li
-                    key={place}
-                    //onClick={() => handleSelect(place)}
-                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
-                  >
-                    {place}
-                  </li>
-                ))}
-              </ul>
-            )}
+            {showDropdown && filteredDestinations.length > 0 && (
+            <ul className="absolute left-0 right-0 bg-white border rounded-md shadow-md mt-1 max-h-60 overflow-y-auto z-50">
+              {filteredDestinations.map((place) => (
+                <li
+                  key={place}
+                  onMouseDown={() => {
+                    setQuery(place);           
+                    setShowDropdown(false); 
+                  }}
+                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                >
+                  {place}
+                </li>
+              ))}
+            </ul>
+          )}
+
           </div>
 
             {/* Dates */}
@@ -137,7 +140,7 @@ export default function Home() {
               <FaCalendarAlt className="text-gray-500" />
               <DatePicker
                 selected={checkInDate}
-                onChange={(date) => setCheckInDate(date)}
+                onChange={(date) => setCheckInDate(date ?? undefined)}
                 selectsStart
                 startDate={checkInDate}
                 endDate={checkOutDate}
@@ -151,7 +154,7 @@ export default function Home() {
               <FaCalendarAlt className="text-gray-500" />
               <DatePicker
                 selected={checkOutDate}
-                onChange={(date) => setCheckOutDate(date)}
+                onChange={(date) => setCheckOutDate(date ?? undefined)}
                 selectsEnd
                 startDate={checkInDate}
                 endDate={checkOutDate}
@@ -165,6 +168,11 @@ export default function Home() {
             {/* Guests */}
             <div className="relative">
             {/* Trigger */}
+            <div
+              tabIndex={0}
+              onBlur={() => setShowGuestDropdown(false)}
+              className="relative"
+            ></div>
             <div
               className="flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer"
               onClick={() => setShowGuestDropdown(!showGuestDropdown)}
