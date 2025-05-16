@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaSearchLocation, FaCalendarAlt, FaUser, FaDownload, FaRegCommentDots} from "react-icons/fa";
 import {IoLogInOutline} from "react-icons/io5";
@@ -19,9 +20,9 @@ function Navbar() {
         {/* Right side: Actions */}
         <div className="flex items-center gap-5 mt-3 sm:mt-0 text-sm">
           <span className="text-gray-700 font-medium">TRY </span>
-          <a href="#" className="text-red-600 hover:underline font-medium">
+          <Link to="/support" className="text-red-600 hover:underline font-medium">
             Support
-          </a>
+          </Link>
           <a href="#" className="text-red-600 hover:underline font-medium">
             Travels
           </a>

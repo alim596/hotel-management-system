@@ -29,5 +29,5 @@
     "@/*": ["*"]
     },
   },
-  "include": ["src", "../hotel-backend/src/destinations.ts"]
+  "include": ["src", "../hotel-backend/src/destinations_search_bar/destinations.ts"]
 }
