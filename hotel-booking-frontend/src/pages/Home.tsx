@@ -12,9 +12,10 @@ function Navbar() {
       <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
         {/* Left side: Logo and menu */}
         <div className="flex items-center gap-6">
-          <span className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <Link to="/"
+            className="text-2xl font-bold text-gray-800 flex items-center gap-2 hover:text-blue-600 cursor-pointer">
             Hotel Booking System
-          </span>
+            </Link>
         </div>
 
         {/* Right side: Actions */}
@@ -37,6 +38,7 @@ function Navbar() {
     </nav>
   );
 }
+
 export default function Home() {
   //for check in and check out
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(undefined);
