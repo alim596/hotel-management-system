@@ -1,60 +1,97 @@
 export interface Hotel {
-  id: string;
-  name: string;
-  city: string;
-  rating: number;
-  price: number;
-  imageUrl: string;
+  HotelID: number;
+  Name: string;
+  Address: string;
+  City: string;
+  Country: string;
+  PhoneNumber: string;
+  Email: string;
+  Website?: string;
+  Description?: string;
+  CheckInTime: string;
+  CheckOutTime: string;
+  Rating?: number;
+  Status: "active" | "inactive";
 }
 
 export interface RoomType {
-  id: string;
-  hotelId: string;
-  name: string;
-  description: string;
-  capacity: number;
-  bedType: string;
-  sizeInSqFt: number;
-  basePrice: number;
-  images: string[];
+  RoomTypeID: number;
+  HotelID: number;
+  Name: string;
+  Description: string;
+  Capacity: number;
+  BedType: string;
+  BasePrice: number;
+  Status: "active" | "inactive";
 }
 
 export interface Room {
-  id: string;
-  hotelId: string;
-  roomTypeId: string;
-  roomNumber: string;
-  floor: number;
-  status: "available" | "booked" | "maintenance";
+  RoomID: number;
+  RoomTypeID: number;
+  RoomNumber: string;
+  Floor: number;
+  Status: "available" | "occupied" | "maintenance";
+  Notes?: string;
 }
 
 export interface Guest {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
+  GuestID: number;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  PhoneNumber: string;
+  Address?: string;
+  City?: string;
+  Country?: string;
+  PreferredLanguage?: string;
+  LoyaltyPoints?: number;
+  Status: "active" | "inactive";
 }
 
-export interface Booking {
-  id: string;
-  hotelId: string;
-  roomTypeId: string;
-  checkIn: string;
-  checkOut: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  createdAt: string;
-  status?: "pending" | "confirmed" | "cancelled"; // optional if you need it
+export interface Reservation {
+  ReservationID: number;
+  GuestID: number;
+  BookingDate: string;
+  CheckInDate: string;
+  CheckOutDate: string;
+  NumberOfGuests: number;
+  Status: "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled";
+  SpecialRequests?: string;
+  TotalPrice: number;
+  TaxAmount?: number;
+  DiscountAmount?: number;
+  FinalAmount: number;
+  PromotionID?: number;
+  CancellationDate?: string;
+  CancellationReason?: string;
 }
 
-export interface Review {
-  id: string;
-  hotelId: string;
-  guestId: string;
-  rating: number; // 1–5
-  comment: string;
-  date: string; // date
+export interface ReservationDetail {
+  ReservationDetailID: number;
+  ReservationID: number;
+  RoomID: number;
+  DailyRate: number;
+}
+
+export interface CreateReservationDto {
+  GuestID: number;
+  CheckInDate: string;
+  CheckOutDate: string;
+  NumberOfGuests: number;
+  SpecialRequests?: string;
+  TotalPrice: number;
+  TaxAmount?: number;
+  DiscountAmount?: number;
+  FinalAmount: number;
+  PromotionID?: number;
+  RoomDetails: {
+    RoomID: number;
+    DailyRate: number;
+  }[];
+}
+
+export interface ErrorResponse {
+  statusCode: number;
+  message: string;
+  error?: string;
 }

@@ -1,25 +1,43 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity()
+@Entity('SupportMessages')
 export class SupportMessage {
   @PrimaryGeneratedColumn()
-  id: number;
+  MessageID: number;
 
   @Column()
-  firstName: string;
+  UserID: number;
+
+  @Column()
+  Subject: string;
+
+  @Column('text')
+  Content: string;
 
   @Column({ nullable: true })
-  lastName: string;
+  Category: string;
 
-  @Column()
-  mobile: string;
+  @Column({ nullable: true })
+  Priority: string;
 
-  @Column()
-  email: string;
-
-  @Column({ type: 'text' })
-  message: string;
+  @Column({ default: 'Open' })
+  Status: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  CreatedAt: Date;
+
+  @UpdateDateColumn()
+  UpdatedAt: Date;
+
+  @Column({ nullable: true })
+  AssignedTo: number;
+
+  @Column({ type: 'text', nullable: true })
+  Resolution: string;
 }

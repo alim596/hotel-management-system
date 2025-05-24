@@ -5,10 +5,11 @@ import React, {
   type ChangeEvent,
   type FormEvent,
 } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useHotel } from "../hooks/useHotel";
 import { useRoomTypes } from "../hooks/useRoomTypes";
-import type { RoomType } from "../services/types";
+import { createReservation } from "../services/api";
+import type { RoomType, CreateReservationDto } from "../services/types";
 
 import StepSelector from "../components/booking/StepSelector";
 import Step1 from "../components/booking/Step1";
@@ -20,13 +21,15 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export type BookingForm = {
-  roomTypeId: string;
+  roomTypeId: number;
   checkIn: string;
   checkOut: string;
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
+  numberOfGuests: number;
+  specialRequests?: string;
 };
 
 export type Step1Props = {
@@ -51,6 +54,7 @@ export type Step3Props = {
 };
 
 export default function Booking() {
+  const navigate = useNavigate();
   const { hotelId } = useParams<{ hotelId: string }>();
   const [searchParams] = useSearchParams();
   const { data: hotel, isLoading: hLoading, error: hError } = useHotel();
@@ -62,13 +66,15 @@ export default function Booking() {
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<BookingForm>({
-    roomTypeId: "",
+    roomTypeId: parseInt(searchParams.get("roomType") || "0"),
     checkIn: "",
     checkOut: "",
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
+    numberOfGuests: 1,
+    specialRequests: "",
   });
 
   // Pre-fill dates from URL
@@ -92,19 +98,56 @@ export default function Booking() {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   }
+
   const next = (e?: FormEvent) => {
     e?.preventDefault();
     setStep((s) => s + 1);
   };
+
   const prev = () => setStep((s) => s - 1);
-  const confirm = () => {
-    // Use toastify instead of alert
-    toast.success("Booking confirmed successfully!");
+
+  const confirm = async () => {
+    try {
+      // Find the selected room type
+      const selectedRoomType = roomTypes?.find(
+        (rt) => rt.RoomTypeID === form.roomTypeId
+      );
+      if (!selectedRoomType) {
+        throw new Error("Selected room type not found");
+      }
+
+      // Create reservation data
+      const reservationData: CreateReservationDto = {
+        GuestID: 0, // This will be set after creating/finding the guest
+        CheckInDate: form.checkIn,
+        CheckOutDate: form.checkOut,
+        NumberOfGuests: form.numberOfGuests,
+        SpecialRequests: form.specialRequests,
+        TotalPrice: selectedRoomType.BasePrice,
+        FinalAmount: selectedRoomType.BasePrice, // Add tax calculation logic if needed
+        RoomDetails: [
+          {
+            RoomID: 0, // This will be assigned by the backend
+            DailyRate: selectedRoomType.BasePrice,
+          },
+        ],
+      };
+
+      // Create the reservation
+      const reservation = await createReservation(reservationData);
+
+      toast.success("Booking confirmed successfully!");
+      // Redirect to the confirmation page
+      navigate(`/booking/confirmation/${reservation.ReservationID}`);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create reservation"
+      );
+    }
   };
 
   return (
     <div className="p-8 max-w-lg mx-auto">
-      {/* Toast container */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -115,7 +158,7 @@ export default function Booking() {
       />
 
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Booking: {hotel.name}
+        Booking: {hotel.Name}
       </h1>
 
       <StepSelector currentStep={step} />
@@ -132,7 +175,7 @@ export default function Booking() {
       {step === 2 && (
         <Step2
           form={form}
-          onChange={handleChange as any}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
           onPrev={prev}
           onNext={next}
         />

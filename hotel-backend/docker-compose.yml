@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: hotel-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotel_booking_system
+      MYSQL_USER: hoteluser
+      MYSQL_PASSWORD: hotelpassword
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/database/schemas:/docker-entrypoint-initdb.d
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      timeout: 20s
+      retries: 10
+
+  # NestJS Backend Application
+  hotel-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: hotel-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: hoteluser
+      DB_PASSWORD: hotelpassword
+      DB_NAME: hotel_booking_system
+      PORT: 3001
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotel-network
+    command: npm run start:dev
+
+  # phpMyAdmin (Optional - for database management)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: hotel-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: hoteluser
+      PMA_PASSWORD: hotelpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - '8080:80'
+    depends_on:
+      - mysql
+    networks:
+      - hotel-network
+
+volumes:
+  mysql_data:
+
+networks:
+  hotel-network:
+    driver: bridge

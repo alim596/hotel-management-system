@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import HotelCard from "../components/HotelCard";
 import SortControl, { type SortOption } from "../components/SortControl";
 import { useHotels } from "../hooks/useHotels";
+import type { Hotel } from "../services/types";
 
 export default function HotelList() {
   const { data: hotels, isLoading, error } = useHotels();
@@ -15,11 +16,13 @@ export default function HotelList() {
   const checkOut = searchParams.get("checkOut") || "";
   const guests = searchParams.get("guests") || "1";
 
-  // 1) Filter by city
+  // 1) Filter by city and active status
   const filtered = useMemo(() => {
     if (!hotels) return [];
-    return hotels.filter((h) =>
-      city ? h.city.toLowerCase().includes(city.toLowerCase()) : true
+    return hotels.filter(
+      (h) =>
+        h.Status === "active" &&
+        (city ? h.City.toLowerCase().includes(city.toLowerCase()) : true)
     );
   }, [hotels, city]);
 
@@ -28,13 +31,13 @@ export default function HotelList() {
     return [...filtered].sort((a, b) => {
       switch (sort) {
         case "price-asc":
-          return a.price - b.price;
+          return a.BasePrice - b.BasePrice;
         case "price-desc":
-          return b.price - a.price;
+          return b.BasePrice - a.BasePrice;
         case "rating-asc":
-          return a.rating - b.rating;
+          return (a.Rating || 0) - (b.Rating || 0);
         case "rating-desc":
-          return b.rating - a.rating;
+          return (b.Rating || 0) - (a.Rating || 0);
         default:
           return 0;
       }
@@ -79,7 +82,7 @@ export default function HotelList() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sorted.map((hotel) => (
-            <HotelCard key={hotel.id} hotel={hotel} />
+            <HotelCard key={hotel.HotelID} hotel={hotel} />
           ))}
         </div>
       )}

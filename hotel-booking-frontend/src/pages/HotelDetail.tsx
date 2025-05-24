@@ -10,7 +10,7 @@ export default function HotelDetail() {
     data: roomTypes,
     isLoading: rtLoading,
     error: rtError,
-  } = useRoomTypes(hotel?.id);
+  } = useRoomTypes(hotel?.HotelID?.toString());
 
   if (hLoading || rtLoading) return <div className="p-4">Loading…</div>;
   if (hError)
@@ -22,17 +22,38 @@ export default function HotelDetail() {
   return (
     <div className="p-4 max-w-3xl mx-auto space-y-6">
       {/* Hotel Info */}
-      <h1 className="text-3xl font-bold">{hotel.name}</h1>
-      <p className="text-gray-600">{hotel.city}</p>
-      <img
-        src={hotel.imageUrl}
-        alt={hotel.name}
-        className="w-full h-64 object-cover rounded-lg"
-      />
-      <div className="flex gap-4">
-        <span className="font-semibold">Rating:</span> {hotel.rating}★
-        <span className="font-semibold">Price:</span> ${hotel.price}/night
+      <h1 className="text-3xl font-bold">{hotel.Name}</h1>
+      <div className="text-gray-600">
+        <p>{hotel.Address}</p>
+        <p>
+          {hotel.City}, {hotel.Country}
+        </p>
+        <p>Phone: {hotel.PhoneNumber}</p>
+        <p>Email: {hotel.Email}</p>
       </div>
+      {hotel.Website && (
+        <img
+          src={hotel.Website}
+          alt={hotel.Name}
+          className="w-full h-64 object-cover rounded-lg"
+        />
+      )}
+      <div className="grid grid-cols-2 gap-4">
+        {hotel.Rating && (
+          <div>
+            <span className="font-semibold">Rating:</span> {hotel.Rating}★
+          </div>
+        )}
+        <div>
+          <span className="font-semibold">Check-in:</span> {hotel.CheckInTime}
+        </div>
+        <div>
+          <span className="font-semibold">Check-out:</span> {hotel.CheckOutTime}
+        </div>
+      </div>
+      {hotel.Description && (
+        <p className="text-gray-700">{hotel.Description}</p>
+      )}
 
       {/* Room Types */}
       <section>
@@ -40,35 +61,31 @@ export default function HotelDetail() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {roomTypes!.map((rt: RoomType) => (
             <div
-              key={rt.id}
+              key={rt.RoomTypeID}
               className="border rounded-lg overflow-hidden shadow-sm"
             >
-              <img
-                src={rt.images[0]}
-                alt={rt.name}
-                className="h-40 w-full object-cover"
-              />
               <div className="p-4">
-                <h3 className="text-xl font-medium">{rt.name}</h3>
-                <p className="text-gray-700">{rt.description}</p>
+                <h3 className="text-xl font-medium">{rt.Name}</h3>
+                <p className="text-gray-700">{rt.Description}</p>
                 <p className="mt-2">
-                  <span className="font-semibold">Capacity:</span> {rt.capacity}{" "}
+                  <span className="font-semibold">Capacity:</span> {rt.Capacity}{" "}
                   guests
                 </p>
                 <p>
-                  <span className="font-semibold">Bed Type:</span> {rt.bedType}
+                  <span className="font-semibold">Bed Type:</span> {rt.BedType}
                 </p>
-                <p>
-                  <span className="font-semibold">Size:</span> {rt.sizeInSqFt}{" "}
-                  ft²
-                </p>
-                <p className="mt-2 font-bold">${rt.basePrice}/night</p>
-                <Link
-                  to={`/booking/${hotel.id}`}
-                  className="mt-4 inline-block bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
-                >
-                  Select
-                </Link>
+                <p className="mt-2 font-bold">${rt.BasePrice}/night</p>
+                {rt.Status === "active" && (
+                  <Link
+                    to={`/booking/${hotel.HotelID}?roomType=${rt.RoomTypeID}`}
+                    className="mt-4 inline-block bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
+                  >
+                    Select
+                  </Link>
+                )}
+                {rt.Status === "inactive" && (
+                  <p className="mt-4 text-red-500">Currently Unavailable</p>
+                )}
               </div>
             </div>
           ))}
