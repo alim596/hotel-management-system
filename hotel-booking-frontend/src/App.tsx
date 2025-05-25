@@ -5,6 +5,7 @@ import HotelList from "./pages/HotelList";
 import HotelDetail from "./pages/HotelDetail";
 import Booking from "./pages/Booking";
 import Support from "./pages/Support";
+import HotelRegister from "./pages/HotelRegister";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <Route path="/hotels/:hotelId" element={<HotelDetail />} />
       <Route path="/booking/:hotelId" element={<Booking />} />
       <Route path="/support" element={<Support />} />
+      <Route path="/HotelRegister" element={<HotelRegister />} />
       {/* Redirect any unknown route back to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
