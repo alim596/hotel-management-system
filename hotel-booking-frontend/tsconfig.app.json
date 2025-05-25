@@ -19,15 +19,17 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
     /*for absolute paths*/
     "baseUrl": "./src",
     "paths": {
-    "@/*": ["*"]
-    },
+      "@/*": ["*"]
+    }
   },
-  "include": ["src", "../hotel-backend/src/destinations_search_bar/destinations.ts"]
+  "include": [
+    "src",
+    "../hotel-backend/src/destinations_search_bar/destinations.ts"
+  ]
 }

@@ -53,7 +53,8 @@ services:
 
   # phpMyAdmin (Optional - for database management)
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
+    image: arm64v8/phpmyadmin:latest
+    platform: linux/arm64/v8
     container_name: hotel-phpmyadmin
     restart: unless-stopped
     environment:
@@ -68,8 +69,26 @@ services:
     networks:
       - hotel-network
 
+  postgres:
+    image: postgres:latest
+    container_name: hotel_management_db
+    environment:
+      POSTGRES_DB: hotel_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   mysql_data:
+  postgres_data:
 
 networks:
   hotel-network:

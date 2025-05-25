@@ -4,71 +4,76 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   Index,
 } from 'typeorm';
 
 export enum UserType {
-  GUEST = 'Guest',
-  HOTEL_STAFF = 'HotelStaff',
-  ADMINISTRATOR = 'Administrator',
+  GUEST = 'guest',
+  HOTEL_STAFF = 'hotel_staff',
+  ADMIN = 'admin',
 }
 
-@Entity('Users')
-@Index(['UserType'])
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  UserID: number;
+  id: number;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  Email: string;
+  @Column({ nullable: true })
+  firstName: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  Password: string;
+  @Column({ nullable: true })
+  lastName: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  FirstName: string;
+  @Column({ unique: true, nullable: true })
+  email: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  LastName: string;
-
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  PhoneNumber: string;
-
-  @Column({ type: 'date', nullable: true })
-  DateOfBirth: Date;
-
-  @Column({ type: 'text', nullable: true })
-  Address: string;
-
-  @CreateDateColumn()
-  RegistrationDate: Date;
+  @Column({ nullable: true })
+  password: string;
 
   @Column({
-    type: 'enum',
+    type: 'varchar',
     enum: UserType,
+    default: UserType.GUEST,
   })
-  UserType: UserType;
+  @Index()
+  role: UserType;
 
-  @Column({ type: 'boolean', default: true })
-  IsActive: boolean;
+  @Column({ nullable: true })
+  phoneNumber: string;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth: Date;
+
+  @Column({ type: 'text', nullable: true })
+  address: string;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
-  LastLoginDate: Date;
+  lastLoginDate: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 
   // Virtual properties
   get fullName(): string {
-    return `${this.FirstName} ${this.LastName}`;
+    return `${this.firstName} ${this.lastName}`;
   }
 
   get isGuest(): boolean {
-    return this.UserType === UserType.GUEST;
+    return this.role === UserType.GUEST;
   }
 
   get isStaff(): boolean {
-    return this.UserType === UserType.HOTEL_STAFF;
+    return this.role === UserType.HOTEL_STAFF;
   }
 
   get isAdmin(): boolean {
-    return this.UserType === UserType.ADMINISTRATOR;
+    return this.role === UserType.ADMIN;
   }
 }
