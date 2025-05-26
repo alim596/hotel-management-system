@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { type User } from "../shared/types";
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 import TokenService from "../services/tokenService";
 import ApiClient from "../services/apiClient";
 
@@ -23,10 +24,23 @@ export const useAuth = () => {
 
   useEffect(() => {
     const validateSession = async () => {
-      try {
-        const token = TokenService.getAccessToken();
-        if (!token) {
-          // This is a normal case - user is not logged in
+      const token = TokenService.getAccessToken();
+      if (token) {
+        try {
+          const { exp } = jwtDecode<JwtPayload>(token);
+          if (exp * 1000 < Date.now()) {
+            // token expired locally
+            TokenService.removeTokens();
+            setAuthState({
+              isAuthenticated: false,
+              user: null,
+              isLoading: false,
+            });
+            return;
+          }
+        } catch {
+          // invalid token format
+          TokenService.removeTokens();
           setAuthState({
             isAuthenticated: false,
             user: null,
@@ -34,25 +48,19 @@ export const useAuth = () => {
           });
           return;
         }
+      }
 
-        const user = await ApiClient.get<User>("/users/me");
-        setAuthState({
-          isAuthenticated: true,
-          user,
-          isLoading: false,
-        });
-      } catch (error) {
-        console.error("Session validation error:", error);
-        // Only log actual errors, not the "no token" case
-        if (error instanceof Error && error.message !== "No token found") {
-          console.error("Session validation error:", error);
-        }
+      // rest of your existing logic:
+      if (!token) {
+        setAuthState({ isAuthenticated: false, user: null, isLoading: false });
+        return;
+      }
+      try {
+        const user = await ApiClient.get<User>("api/users/me");
+        setAuthState({ isAuthenticated: true, user, isLoading: false });
+      } catch {
         TokenService.removeTokens();
-        setAuthState({
-          isAuthenticated: false,
-          user: null,
-          isLoading: false,
-        });
+        setAuthState({ isAuthenticated: false, user: null, isLoading: false });
       }
     };
 
@@ -62,7 +70,7 @@ export const useAuth = () => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await ApiClient.post<LoginResponse>(
-        "/auth/login",
+        "api/auth/login",
         { email, password },
         { requiresAuth: false }
       );
@@ -104,7 +112,7 @@ export const useAuth = () => {
   // Refresh user data
   const refreshUser = async () => {
     try {
-      const user = await ApiClient.get<User>("/users/me");
+      const user = await ApiClient.get<User>("api/users/me");
       setAuthState((prev) => ({
         ...prev,
         user,

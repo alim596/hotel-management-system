@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Drawer,
@@ -20,13 +20,17 @@ import {
   Business as BusinessIcon,
   BookOnline as BookingIcon,
   Menu as MenuIcon,
+  Logout as LogoutIcon,
 } from "@mui/icons-material";
+import { useAuth } from "../../hooks/useAuth";
 
 const drawerWidth = 240;
 
 const AdminLayout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/admin" },
@@ -37,6 +41,12 @@ const AdminLayout: React.FC = () => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  // When the user clicks “Logout”, clear tokens & send them to /login
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   const drawer = (
@@ -59,6 +69,13 @@ const AdminLayout: React.FC = () => {
             <ListItemText primary={item.text} />
           </ListItemButton>
         ))}
+        {/* Logout button at bottom */}
+        <ListItemButton onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItemButton>
       </List>
     </Box>
   );

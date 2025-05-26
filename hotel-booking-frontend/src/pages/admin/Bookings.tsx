@@ -67,9 +67,11 @@ const Bookings: React.FC = () => {
   const fetchBookings = async () => {
     try {
       const response = await fetch(
-        `/api/admin/bookings?page=${page + 1}&limit=${pageSize}${
-          searchQuery ? `&search=${searchQuery}` : ""
-        }${statusFilter ? `&status=${statusFilter}` : ""}`,
+        `http://localhost:3000/api/api/admin/bookings?page=${
+          page + 1
+        }&limit=${pageSize}${searchQuery ? `&search=${searchQuery}` : ""}${
+          statusFilter ? `&status=${statusFilter}` : ""
+        }`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

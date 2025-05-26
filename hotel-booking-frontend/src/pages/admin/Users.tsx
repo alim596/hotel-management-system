@@ -51,9 +51,12 @@ const Users: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const response = await fetch(
-        `/api/admin/users?page=${page + 1}&limit=${pageSize}${
-          selectedRole ? `&role=${selectedRole}` : ""
-        }${searchQuery ? `&search=${searchQuery}` : ""}`,
+        `http://localhost:3000/api/api/admin/users?page=${
+          page + 1
+        }&limit=${pageSize}${selectedRole ? `&role=${selectedRole}` : ""}${
+          searchQuery ? `&search=${searchQuery}` : ""
+        }
+        `,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -207,7 +210,7 @@ const Users: React.FC = () => {
               onChange={(e) => setSelectedRole(e.target.value)}
             >
               <MenuItem value="">All Roles</MenuItem>
-              {Object.values(UserRole).map((role) => (
+              {(Object.values(UserRole) ?? []).map((role) => (
                 <MenuItem key={role} value={role}>
                   {role}
                 </MenuItem>
@@ -236,7 +239,6 @@ const Users: React.FC = () => {
               pageSize,
             }}
             pageSizeOptions={[5, 10, 20, 50]}
-            rowCount={totalUsers}
             onPaginationModelChange={(model) => {
               setPage(model.page);
               setPageSize(model.pageSize);
@@ -258,7 +260,7 @@ const Users: React.FC = () => {
               label="Role"
               onChange={(e) => setEditRole(e.target.value as UserRole)}
             >
-              {Object.values(UserRole).map((role) => (
+              {(Object.values(UserRole) ?? []).map((role) => (
                 <MenuItem key={role} value={role}>
                   {role}
                 </MenuItem>

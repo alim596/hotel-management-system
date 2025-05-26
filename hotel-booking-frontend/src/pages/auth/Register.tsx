@@ -50,7 +50,7 @@ const Register: React.FC = () => {
 
     try {
       await ApiClient.post(
-        "/auth/register",
+        "api/auth/register",
         {
           firstName: formData.firstName,
           lastName: formData.lastName,

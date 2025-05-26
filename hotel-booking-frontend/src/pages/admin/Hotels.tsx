@@ -31,9 +31,9 @@ const Hotels: React.FC = () => {
   const fetchHotels = async () => {
     try {
       const response = await fetch(
-        `/api/admin/hotels?page=${page + 1}&limit=${pageSize}${
-          searchQuery ? `&search=${searchQuery}` : ""
-        }`,
+        `http://localhost:3000/api/api/admin/hotels?page=${
+          page + 1
+        }&limit=${pageSize}${searchQuery ? `&search=${searchQuery}` : ""}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

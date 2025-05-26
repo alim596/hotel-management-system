@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
     const fetchStats = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/admin/dashboard",
+          "http://localhost:3000/api/api/admin/dashboard",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -155,7 +155,7 @@ const Dashboard: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {stats.usersByRole.map((role) => (
+                {(stats.usersByRole ?? []).map((role) => (
                   <TableRow key={role.role}>
                     <TableCell>{role.role}</TableCell>
                     <TableCell align="right">{role.count}</TableCell>
@@ -172,7 +172,7 @@ const Dashboard: React.FC = () => {
             </Typography>
             <Table size="small">
               <TableBody>
-                {stats.bookingsByStatus.map((status) => (
+                {(stats.bookingsByStatus ?? []).map((status) => (
                   <TableRow key={status.status}>
                     <TableCell>{status.status}</TableCell>
                     <TableCell align="right">{status.count}</TableCell>
@@ -202,7 +202,7 @@ const Dashboard: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {stats.recentBookings.map((booking) => (
+                {(stats.recentBookings ?? []).map((booking) => (
                   <TableRow key={booking.id}>
                     <TableCell>
                       {formatDate(new Date(booking.created_at))}
