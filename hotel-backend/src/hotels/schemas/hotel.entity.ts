@@ -8,6 +8,8 @@ import {
   Index,
 } from 'typeorm';
 
+import { RoomType } from '../../room-types/schemas/room-type.entity'; // Adjust the import path as necessary
+
 @Entity('Hotels')
 @Index(['City', 'Country'])
 @Index(['StarRating'])
@@ -73,9 +75,8 @@ export class Hotel {
   @Column({ type: 'int', default: 0 })
   TotalRooms: number;
 
-  // Relationships - temporarily commented out to avoid circular dependency
-  // @OneToMany(() => RoomType, roomType => roomType.hotel)
-  // roomTypes: RoomType[];
+  @OneToMany(() => RoomType, (roomType) => roomType.hotel)
+  roomTypes: RoomType[];
 
   // Virtual properties for API responses
   get averageRating(): number {

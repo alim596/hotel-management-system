@@ -5,24 +5,24 @@ import {
   PoolConnection,
   createPool as createMySqlPool,
 } from 'mysql2/promise';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import { seedDatabase } from './seeders';
 
-// Database configuration
+// Database configuration from environment
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT || '5432', 10),
   database: process.env.DB_NAME || 'hotel_management',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
 };
 
-// Determine database type from environment
+// Determine database type
 const dbType = process.env.DB_TYPE?.toLowerCase() || 'postgres';
 
-// Create appropriate pool based on database type
-const createPool = (): PgPool | MySQLPool => {
+// Create appropriate pool
+function createPool(): PgPool | MySQLPool {
   if (dbType === 'mysql') {
     return createMySqlPool({
       ...dbConfig,
@@ -33,49 +33,58 @@ const createPool = (): PgPool | MySQLPool => {
   } else {
     return new PgPool(dbConfig);
   }
-};
+}
 
 export const pool = createPool();
 
-async function initializeDatabase() {
+export async function initializeDatabase() {
   let pgClient: PoolClient | null = null;
   let mysqlConnection: PoolConnection | null = null;
 
   try {
     console.log('Starting database initialization...');
 
-    // Read the schema file
+    // Read schema.sql
     const schemaPath = path.join(__dirname, 'schema.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+    const schemaSql = fs.readFileSync(schemaPath, 'utf8');
 
     if (dbType === 'mysql') {
       const mysqlPool = pool as MySQLPool;
       mysqlConnection = await mysqlPool.getConnection();
 
-      // Split the schema into individual statements
-      const statements = schema
+      // Drop and recreate database schema for idempotency
+      await mysqlConnection.query(
+        'DROP SCHEMA IF EXISTS public; CREATE SCHEMA public;',
+      );
+      console.log('Dropped and recreated MySQL public schema');
+
+      // Execute all statements in schema.sql
+      const statements = schemaSql
         .split(';')
-        .map((statement) => statement.trim())
-        .filter((statement) => statement.length > 0);
-
-      // Execute each statement
-      for (const statement of statements) {
-        await mysqlConnection.query(statement);
+        .map((s) => s.trim())
+        .filter(Boolean);
+      for (const stmt of statements) {
+        await mysqlConnection.query(stmt);
       }
-      console.log('Schema created successfully');
+      console.log('MySQL schema created successfully');
 
-      // Seed the database
+      // Seed data
       await seedDatabase();
     } else {
       const pgPool = pool as PgPool;
       pgClient = await pgPool.connect();
 
-      await pgClient.query('BEGIN');
-      await pgClient.query(schema);
-      await pgClient.query('COMMIT');
-      console.log('Schema created successfully');
+      // Drop and recreate public schema for idempotency
+      await pgClient.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
+      console.log('Dropped and recreated Postgres public schema');
 
-      // Seed the database
+      // Run schema within transaction
+      await pgClient.query('BEGIN');
+      await pgClient.query(schemaSql);
+      await pgClient.query('COMMIT');
+      console.log('Postgres schema created successfully');
+
+      // Seed data
       await seedDatabase();
     }
 
@@ -85,7 +94,7 @@ async function initializeDatabase() {
       await pgClient.query('ROLLBACK').catch(console.error);
     }
     console.error('Error initializing database:', error);
-    throw error;
+    process.exit(1);
   } finally {
     if (pgClient) {
       pgClient.release();

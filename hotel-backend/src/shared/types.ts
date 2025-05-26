@@ -2,8 +2,8 @@ import { Request } from 'express';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
   GUEST = 'GUEST',
+  MANAGER = 'MANAGER',
   HOTEL_MANAGER = 'HOTEL_MANAGER',
 }
 
@@ -59,7 +59,7 @@ export interface DBHotel {
   city: string;
   country: string;
   address: string;
-  image_url: string;
+  image_url: string[];
   average_rating: number;
   manager_id: number;
   created_at: Date;

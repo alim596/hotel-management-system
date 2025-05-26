@@ -10,6 +10,7 @@ import { SupportModule } from './support_forms/support.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { staticDatabaseConfig } from './database/config/database.config';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { staticDatabaseConfig } from './database/config/database.config';
     PromotionsModule,
     SupportModule,
     UsersModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
